@@ -63,11 +63,34 @@ class Experiment:
     @staticmethod
     def load(path):
         with open(path, "rb") as f:
-            return pkl.load(f)
+            obj = pkl.load(f)
+
+        # Reinitialize the Manager and assign loaded data to managed dictionaries
+        obj.manager = Manager()
+        obj.successMap = obj.manager.dict(obj.temp_successMap)
+        obj.procCountMap = obj.manager.dict(obj.temp_procCountMap)
+
+        # Cleanup temporary attributes if they were stored
+        del obj.temp_successMap, obj.temp_procCountMap
+
+        return obj
 
     def save(self):
+        # Temporarily replace manager dictionaries with regular dictionaries for pickling
+        temp_successMap = dict(self.successMap)
+        temp_procCountMap = dict(self.procCountMap)
+
+        # Temporarily unset the manager dictionaries in self
+        self.successMap, self.procCountMap = None, None
+
+        # Save the instance of Experiment without Manager attributes
         with open(f"{self.name}.results.pkl", "wb") as f:
             pkl.dump(self, f)
+
+        # Restore the managed dictionaries
+        self.successMap = self.manager.dict(temp_successMap)
+        self.procCountMap = self.manager.dict(temp_procCountMap)
+
         
     def __repr__(self):
         solved = len({k for k in self.successMap.keys() if self.successMap[k]})
