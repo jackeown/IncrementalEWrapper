@@ -74,7 +74,7 @@ class Experiment:
 
         # Temporarily unset the manager dictionaries in self
         self.manager = None
-        self.successMap, self.procCountMap = None, None
+        self.successMap, self.procCountMap = temp_successMap, temp_procCountMap
 
         # Save the instance of Experiment without Manager attributes
         with open(f"{self.name}.results.pkl", "wb") as f:
