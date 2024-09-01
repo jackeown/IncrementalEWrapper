@@ -64,23 +64,16 @@ class Experiment:
     def load(path):
         with open(path, "rb") as f:
             obj = pkl.load(f)
-
-        # Reinitialize the Manager and assign loaded data to managed dictionaries
-        obj.manager = Manager()
-        obj.successMap = obj.manager.dict(obj.temp_successMap)
-        obj.procCountMap = obj.manager.dict(obj.temp_procCountMap)
-
-        # Cleanup temporary attributes if they were stored
-        del obj.temp_successMap, obj.temp_procCountMap
-
         return obj
 
     def save(self):
         # Temporarily replace manager dictionaries with regular dictionaries for pickling
         temp_successMap = dict(self.successMap)
         temp_procCountMap = dict(self.procCountMap)
+        temp_manager = self.manager
 
         # Temporarily unset the manager dictionaries in self
+        self.manager = None
         self.successMap, self.procCountMap = None, None
 
         # Save the instance of Experiment without Manager attributes
@@ -88,6 +81,7 @@ class Experiment:
             pkl.dump(self, f)
 
         # Restore the managed dictionaries
+        self.manager = temp_manager
         self.successMap = self.manager.dict(temp_successMap)
         self.procCountMap = self.manager.dict(temp_procCountMap)
 
