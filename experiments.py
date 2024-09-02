@@ -9,8 +9,8 @@ from time import sleep, time
 import re
 
 
-# args = environmentVars, prob, eArgs
-proverTemplate = "{} python incrementalEWrapper.py {} --eArgs='{} -l2'"
+# args = environmentVars, prob, higherOrder, eArgs
+proverTemplate = "{} python incrementalEWrapper.py {} {} --eArgs='{} -l2'"
 
 safePercent = lambda a,b: "undefined" if b == 0 else round(100*a/b,2)
 
@@ -23,9 +23,9 @@ def waitForWorkers(asyncResults, numWorkers):
     return asyncResults
 
 
-def runE(useDataDir, eArgs, problem, successMap, procCountMap):
+def runE(useDataDir, eArgs, problem, higherOrder, successMap, procCountMap):
     environmentVars = "SLH_PERSISTENT_DATA_DIR=data_dir" if useDataDir else ""
-    command = proverTemplate.format(environmentVars, problem, eArgs)
+    command = proverTemplate.format(environmentVars, problem, "--higherOrder" if higherOrder else "", eArgs)
     # print(command)
     p = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -123,7 +123,7 @@ Average processed clauses: {sum(self.procCountMap.values()) / max(len(self.procC
             tasks = []
             t1 = time()
             for i, problem in enumerate(track(self.problems, description="Running")):
-                tasks.append(p.apply_async(runE, args=(self.useDataDir, self.eArgs, problem, self.successMap, self.procCountMap)))
+                tasks.append(p.apply_async(runE, args=(self.useDataDir, self.eArgs, problem, self.higherOrder, self.successMap, self.procCountMap)))
                 groupsAttempted.add(getProbId(problem))
 
                 tasks = waitForWorkers(tasks, numWorkers)
