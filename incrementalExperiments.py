@@ -7,6 +7,7 @@ import subprocess
 from collections import defaultdict
 from time import sleep, time
 import re
+import os
 
 
 safePercent = lambda a,b: "undefined" if b == 0 else round(100*a/b,2)
@@ -36,6 +37,14 @@ def runE(useDataDir, eArgs, problem, higherOrder, successMap, procCountMap):
     else:
         print("Failed")
         successMap[problem] = False
+
+
+# getProbId = lambda p: p.split("_prob_")[1].split("_")[0] # should work with full path or just filename
+def getProbId(p):
+    if "_prob_" in p:
+        return p.split("_prob_")[1].split("_")[0]
+    else:
+        return os.path.split(p)[1]
 
 
 
@@ -108,7 +117,6 @@ Average processed clauses: {sum(self.procCountMap.values()) / max(len(self.procC
         # ...
 
         # group problems by problem id
-        getProbId = lambda p: p.split("_prob_")[1].split("_")[0] # should work with full path or just filename
         probGroups = defaultdict(list)
         for p in track(self.problems, description="Grouping"):
             probGroups[getProbId(p)].append(p)
