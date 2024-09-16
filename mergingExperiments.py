@@ -34,6 +34,7 @@ if __name__ == "__main__":
     parser.add_argument("name")
     parser.add_argument("problemsPath")
     parser.add_argument("--higherOrder", action="store_true")
+    parser.add_argument("--eArgs", default="")
     parser.add_argument("--numWorkers", type=int, default=4)
     args = parser.parse_args()
 
@@ -43,7 +44,7 @@ if __name__ == "__main__":
                      path=args.problemsPath,
                      higherOrder=args.higherOrder,
                      problems=glob(f"{args.problemsPath}/*.p"),
-                     eArgs=f"--parse-strategy={masterStratPath}",
+                     eArgs=f"--parse-strategy={masterStratPath} {args.eArgs}",
                      useDataDir=False)
 
     exp.run(numWorkers=args.numWorkers)
