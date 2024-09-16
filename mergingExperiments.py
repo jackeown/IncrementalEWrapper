@@ -38,7 +38,7 @@ if __name__ == "__main__":
     parser.add_argument("--numWorkers", type=int, default=4)
     args = parser.parse_args()
 
-    masterStratPath = getMasterStrat(args.problemsPath, args)
+    masterStratPath = getMasterStrat(args)
 
     exp = Experiment(name=args.name,
                      path=args.problemsPath,
