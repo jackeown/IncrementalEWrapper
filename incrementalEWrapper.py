@@ -28,7 +28,6 @@ if __name__ == "__main__":
     parser.add_argument("problem")
     parser.add_argument("--eArgs", default="")
     parser.add_argument("--higherOrder", action="store_true")
-
     args = parser.parse_args()
 
     if os.environ.get("SLH_PERSISTENT_DATA_DIR") is not None:
@@ -42,7 +41,6 @@ if __name__ == "__main__":
         saveStratHistory(stratHist, dataDir)                                # 3.b. 
         masterStratPath = makeMasterFromHistory(stratHist, dataDir)         # 3.c.
         releaseLock(lockPath)
-
         runE(args, masterStratPath)
     else:
         print("Running E without persistent data")

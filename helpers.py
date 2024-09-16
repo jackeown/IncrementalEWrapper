@@ -115,13 +115,15 @@ def saveStratHistory(hist, dataDir):
     with open(stratHistPath, "wb") as f:
         pickle.dump(hist, f)
 
-def makeMasterFromHistory(hist, dataDir):
+def makeMasterFromHistory(hist, dataDir, toFile=True):
     masterStratPath = f"{dataDir}/MASTER.{os.getpid()}.strat"
-    with open(masterStratPath, "w") as f:
-        master = makeMasterStrat(hist, all_ones=False)
-        f.write(serializeStrat(master))
-
-    return masterStratPath
+    master = makeMasterStrat(hist, all_ones=False)
+    if toFile:
+        with open(masterStratPath, "w") as f:
+            f.write(serializeStrat(master))
+        return masterStratPath
+    else:
+        return master
 
 
 
@@ -197,8 +199,6 @@ def serializeStrat(summary):
             for _, (weight, cef) in enumerate(v):
                 l.append(f"{weight}.{cef}")
             summary[k] = '"(' + ",".join(l) + ')"'
-        # elif k == "heuristic_name": 
-        #     del summary[k]
         else:
             summary[k] = unparse(k,v)
     

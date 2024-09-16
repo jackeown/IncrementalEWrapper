@@ -2,18 +2,14 @@ import argparse
 import pickle as pkl
 from glob import glob
 from multiprocessing import Pool, Manager
-from rich.progress import Progress, track
+from rich.progress import track
 import subprocess
 from collections import defaultdict
 from time import sleep, time
 import re
 
 
-# args = environmentVars, prob, higherOrder, eArgs
-proverTemplate = "{} python incrementalEWrapper.py {} {} --eArgs='{} -l2'"
-
 safePercent = lambda a,b: "undefined" if b == 0 else round(100*a/b,2)
-
 
 def waitForWorkers(asyncResults, numWorkers):
     while sum(1 for r in asyncResults if not r.ready()) > numWorkers:
@@ -23,10 +19,11 @@ def waitForWorkers(asyncResults, numWorkers):
     return asyncResults
 
 
+# args = environmentVars, prob, higherOrder, eArgs
+proverTemplate = "{} python incrementalEWrapper.py {} {} --eArgs='{} -l2'"
 def runE(useDataDir, eArgs, problem, higherOrder, successMap, procCountMap):
     environmentVars = "SLH_PERSISTENT_DATA_DIR=data_dir" if useDataDir else ""
     command = proverTemplate.format(environmentVars, problem, "--higherOrder" if higherOrder else "", eArgs)
-    # print(command)
     p = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # check SZS status:
@@ -34,8 +31,6 @@ def runE(useDataDir, eArgs, problem, higherOrder, successMap, procCountMap):
     if "SZS status Theorem" in stdout:
         print("Solved")
         successMap[problem] = True
-        # Extract number of processed clauses from a line like this:
-        # "# Processed clauses                    : 5337"
         numProcessed = re.search(r"# Processed clauses                    : (\d+)", stdout).group(1)
         procCountMap[problem] = int(numProcessed)
     else:
