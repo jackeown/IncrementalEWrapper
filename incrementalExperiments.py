@@ -158,6 +158,8 @@ Average processed clauses: {sum(self.procCountMap.values()) / max(len(self.procC
 
                     print(self)
 
+            tasks = waitForWorkers(tasks, 0) # Wait for all remaining tasks to complete
+
         self.finished = True
         self.save()
 
