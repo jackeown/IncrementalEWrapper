@@ -19,7 +19,7 @@ def getProbStrat(problem, dataDir, higherOrder):
     executable = "eprover-ho" if higherOrder else "eprover"
     executable = f"./eprover/PROVER/{executable}"
     
-    eArgs = f"--auto --print-strategy"
+    eArgs = f"--auto --print-strategy --cpu-limit=120"
     os.makedirs(f"{dataDir}/tmp", exist_ok=True)
     with open(f"{dataDir}/tmp/{probName}", "w") as f:
         subprocess.run(f"{executable} {eArgs} {problem}", shell=True, stdout=f)
