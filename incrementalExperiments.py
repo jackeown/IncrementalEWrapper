@@ -25,16 +25,20 @@ proverTemplate = "{} python incrementalEWrapper.py {} {} --eArgs='{} -l2'"
 def runE(useDataDir, eArgs, problem, higherOrder, successMap, procCountMap):
     environmentVars = "SLH_PERSISTENT_DATA_DIR=data_dir" if useDataDir else ""
     command = proverTemplate.format(environmentVars, problem, "--higherOrder" if higherOrder else "", eArgs)
-    p = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        p = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    # check SZS status:
-    stdout = p.stdout.decode("utf-8")
-    if "SZS status Theorem" in stdout:
-        print("Solved")
-        successMap[problem] = True
-        numProcessed = re.search(r"# Processed clauses                    : (\d+)", stdout).group(1)
-        procCountMap[problem] = int(numProcessed)
-    else:
+        # check SZS status:
+        stdout = p.stdout.decode("utf-8")
+        if "SZS status Theorem" in stdout:
+            print("Solved")
+            successMap[problem] = True
+            numProcessed = re.search(r"# Processed clauses                    : (\d+)", stdout).group(1)
+            procCountMap[problem] = int(numProcessed)
+        else:
+            print("Failed")
+            successMap[problem] = False
+    except:
         print("Failed")
         successMap[problem] = False
 
