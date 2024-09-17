@@ -31,7 +31,7 @@ def runE(useDataDir, eArgs, problem, higherOrder, successMap, procCountMap):
 
         # check SZS status:
         stdout = p.stdout.decode("utf-8")
-        if "SZS status Theorem" in stdout:
+        if "SZS status Theorem" in stdout or "SZS status Unsatisfiable" in stdout:
             print("Solved")
             successMap[problem] = True
             numProcessed = re.search(r"# Processed clauses                    : (\d+)", stdout).group(1)
