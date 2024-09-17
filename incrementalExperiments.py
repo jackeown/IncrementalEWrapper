@@ -25,6 +25,7 @@ proverTemplate = "{} python incrementalEWrapper.py {} {} --eArgs='{} -l2'"
 def runE(useDataDir, eArgs, problem, higherOrder, successMap, procCountMap):
     environmentVars = "SLH_PERSISTENT_DATA_DIR=data_dir" if useDataDir else ""
     command = proverTemplate.format(environmentVars, problem, "--higherOrder" if higherOrder else "", eArgs)
+    print(f"Running command: '{command}'")
     try:
         p = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
