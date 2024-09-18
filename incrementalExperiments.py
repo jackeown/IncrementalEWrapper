@@ -42,11 +42,9 @@ def runE(useDataDir, eArgs, problem, higherOrder, successMap, procCountMap):
             numProcessed = re.search(r"# Processed clauses                    : (\d+)", stdout).group(1)
             procCountMap[problem] = int(numProcessed)
         else:
-            print("Failed")
-            successMap[problem] = False
+            fail(successMap, problem, stdout)
     except:
-        print("Failed")
-        successMap[problem] = False
+        fail(successMap, problem, stdout)
 
 
 # getProbId = lambda p: p.split("_prob_")[1].split("_")[0] # should work with full path or just filename
