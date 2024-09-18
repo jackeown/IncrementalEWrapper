@@ -12,7 +12,7 @@ def runE(args, masterStratPath):
         eArgs = args.eArgs
     command = f"{executable} {eArgs} {args.problem}"
 
-    print(f"Running command: '{command}'")
+    # print(f"Running command: '{command}'")
     subprocess.run(command, shell=True)
 
 

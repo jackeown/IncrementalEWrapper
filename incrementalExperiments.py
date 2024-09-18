@@ -20,6 +20,11 @@ def waitForWorkers(asyncResults, numWorkers):
     return asyncResults
 
 
+def fail(successMap, problem, stdout):
+    print(f"Failed: {problem}")
+    successMap[problem] = False
+    print(stdout[-3000:])
+
 # args = environmentVars, prob, higherOrder, eArgs
 proverTemplate = "{} python incrementalEWrapper.py {} {} --eArgs='{} -l2'"
 def runE(useDataDir, eArgs, problem, higherOrder, successMap, procCountMap):
