@@ -65,7 +65,7 @@ if __name__ == "__main__":
         path=args.problemsPath,
         higherOrder=args.higherOrder,
         problems=glob(f"{args.problemsPath}/*.p"),
-        eArgs=f"--parse-strategy={masterStratPath} {args.eArgs}",
+        eArgs=f"{args.eArgs} --parse-strategy={masterStratPath}",
         useDataDir=False,
     )
 
