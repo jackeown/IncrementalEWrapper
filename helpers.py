@@ -10,7 +10,10 @@ def runE(args, masterStratPath):
         eArgs = f"{args.eArgs} --parse-strategy={masterStratPath}"
     else:
         eArgs = args.eArgs
-    subprocess.run(f"{executable} {eArgs} {args.problem}", shell=True)
+    command = f"{executable} {eArgs} {args.problem}"
+
+    print(f"Running command: '{command}'")
+    subprocess.run(command, shell=True)
 
 
 
