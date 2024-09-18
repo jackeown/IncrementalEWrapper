@@ -26,7 +26,7 @@ def getMasterStrat(args):
     with Progress() as progress:
         task_id = progress.add_task("Getting strategies", total=len(args_list))
 
-        with Pool(processes=args.numWorkers) as pool:
+        with Pool(processes=args.numWorkersStratCuration) as pool:
             for result in pool.imap_unordered(process_file, args_list):
                 results.append(result)
                 progress.advance(task_id)
@@ -54,6 +54,8 @@ if __name__ == "__main__":
     parser.add_argument("--higherOrder", action="store_true")
     parser.add_argument("--eArgs", default="")
     parser.add_argument("--numWorkers", type=int, default=4)
+    parser.add_argument("--numWorkersStratCuration", type=int, default=4)
+
     args = parser.parse_args()
 
     masterStratPath = getMasterStrat(args)
