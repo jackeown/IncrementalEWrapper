@@ -201,5 +201,5 @@ if __name__ == "__main__":
     parser.add_argument("--numWorkers", type=int, default=4)
     args = parser.parse_args()
 
-    exp = Experiment(args.name, args.problemsPath, args.higherOrder, glob(f"{args.problemsPath}/*.p"), args.eArgs, args.useDataDir)
+    exp = Experiment(args.name, args.problemsPath, args.higherOrder, sorted(glob(f"{args.problemsPath}/*.p")), args.eArgs, args.useDataDir)
     exp.run(numWorkers=args.numWorkers)
