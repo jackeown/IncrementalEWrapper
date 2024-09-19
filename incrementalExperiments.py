@@ -125,7 +125,7 @@ Median processed clauses: {median(list(self.procCountMap.values()))}
         for exp in experiments:
             # The last two lines in each experiment's repr should be replaced
             # with a version computed only over the problems solved by all experiments.
-            print("\n".join(exp.__repr__().split("\n")[:-2]))
+            print("\n".join(exp.__repr__().split("\n")[:-3]))
             procCountMap = {k:v for k,v in exp.procCountMap.items() if k in probsSolvedByAll}
             print(f"""
 Average processesed clauses: {sum(procCountMap.values()) / max(len(procCountMap),1):.2f}
