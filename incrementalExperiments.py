@@ -11,6 +11,7 @@ import os
 
 
 safePercent = lambda a,b: "undefined" if b == 0 else round(100*a/b,2)
+median = lambda l: sorted(l)[len(l)//2] if len(l) > 0 else "undefined"
 
 def waitForWorkers(asyncResults, numWorkers):
     while sum(1 for r in asyncResults if not r.ready()) > numWorkers:
@@ -111,7 +112,25 @@ eArgs: "{self.eArgs}"
 Finished: {self.finished}
 useDataDir: {self.useDataDir}
 Average processed clauses: {sum(self.procCountMap.values()) / max(len(self.procCountMap),1):.2f}
+Median processed clauses: {median(list(self.procCountMap.values()))}
 """
+    
+    @staticmethod
+    def compareExperiments(*paths):
+        experiments = [Experiment.load(path) for path in paths]
+
+        probsSolvedByAll = set.intersection(*[set(x for x in E.successMap if E.successMap[x]) for E in experiments])
+        print(f"Solved by all: {len(probsSolvedByAll)} / {len(experiments[0].successMap)} ({safePercent(len(probsSolvedByAll),len(experiments[0].successMap))}%)")
+
+        for exp in experiments:
+            # The last two lines in each experiment's repr should be replaced
+            # with a version computed only over the problems solved by all experiments.
+            print("\n".join(exp.__repr__().split("\n")[:-2]))
+            procCountMap = {k:v for k,v in exp.procCountMap.items() if k in probsSolvedByAll}
+            print(f"""
+Average processesed clauses: {sum(procCountMap.values()) / max(len(procCountMap),1):.2f}
+Median processesed clauses: {median(list(procCountMap.values()))} 
+            """)
     
     def run(self, numWorkers=4):
 
