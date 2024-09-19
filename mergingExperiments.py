@@ -55,10 +55,15 @@ if __name__ == "__main__":
     parser.add_argument("--eArgs", default="")
     parser.add_argument("--numWorkers", type=int, default=4)
     parser.add_argument("--numWorkersStratCuration", type=int, default=4)
+    parser.add_argument("--alternateStrat", default="", type=str, help="use a given strategy instead of doing merging here.")
 
     args = parser.parse_args()
 
-    masterStratPath = getMasterStrat(args)
+    if args.alternateStrat != "":
+        print("Using alternate strategy")
+        masterStratPath = args.alternateStrat
+    else:
+        masterStratPath = getMasterStrat(args)
 
     exp = Experiment(
         name=args.name,
