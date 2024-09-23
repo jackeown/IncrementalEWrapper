@@ -30,15 +30,15 @@ FILTERED_DIR="$PARENT_DIR/${BASE_NAME}_filtered"
 mkdir -p "$FILTERED_DIR"
 
 # Copy files listed in subset.txt from the problem path to the new directory
-while IFS= read -r file; do
-    # Trim any whitespace around the filename
-    file=$(echo "$file" | xargs)
+while IFS= read -r line; do
+    # Use sed to trim leading and trailing whitespace
+    file=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
     # Check if the file exists before copying
     if [ -f "$PROBLEM_PATH/$file" ]; then
         cp "$PROBLEM_PATH/$file" "$FILTERED_DIR/"
     else
-        echo "Warning: File '$PROBLEM_PATH/$file' does not exist."
+        echo "Warning: File $PROBLEM_PATH/$file does not exist."
     fi
 done < "$SUBSET_PATH"
 
