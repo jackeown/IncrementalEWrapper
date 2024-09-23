@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# This script simply filters a folder containing problem files
-# based on the contents of a text file with filenames of problems to keep.
-
 # Check if two arguments are provided
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <problem_path> <path_to_subset.txt>"
@@ -34,11 +31,14 @@ mkdir -p "$FILTERED_DIR"
 
 # Copy files listed in subset.txt from the problem path to the new directory
 while IFS= read -r file; do
+    # Trim any whitespace around the filename
+    file=$(echo "$file" | xargs)
+
     # Check if the file exists before copying
     if [ -f "$PROBLEM_PATH/$file" ]; then
         cp "$PROBLEM_PATH/$file" "$FILTERED_DIR/"
     else
-        echo "Warning: File $PROBLEM_PATH/$file does not exist."
+        echo "Warning: File '$PROBLEM_PATH/$file' does not exist."
     fi
 done < "$SUBSET_PATH"
 
