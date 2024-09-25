@@ -13,9 +13,12 @@ import os
 safePercent = lambda a,b: "undefined" if b == 0 else round(100*a/b,2)
 median = lambda l: sorted(l)[len(l)//2] if len(l) > 0 else "undefined"
 
-def waitForWorkers(asyncResults, numWorkers):
+def waitForWorkers(asyncResults, numWorkers, timeout=300):
+    t1 = time()
     while sum(1 for r in asyncResults if not r.ready()) > numWorkers:
         sleep(0.1)
+        if time() - t1 > timeout:
+            break
 
     asyncResults = [r for r in asyncResults if not r.ready()]
     return asyncResults
