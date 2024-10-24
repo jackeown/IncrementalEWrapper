@@ -30,10 +30,17 @@ def fail(successMap, problem, stdout):
     # print(stdout[-3000:])
 
 # args = environmentVars, prob, higherOrder, eArgs
-proverTemplate = "{} python incrementalEWrapper.py {} {} --eArgs='{} -l2'"
-def runE(useDataDir, dataDirPath, eArgs, problem, higherOrder, successMap, procCountMap):
+# proverTemplate = "{} python incrementalEWrapper.py {} {} --eArgs='{} -l2'"
+proverTemplate = "{} python incrementalEWrapper.py {} {} {} -- {} -l2"
+def runE(useDataDir, dataDirPath, eArgs, problem, higherOrder, successMap, procCountMap, eprover):
     environmentVars = f"SLH_PERSISTENT_DATA_DIR={dataDirPath}" if useDataDir else ""
-    command = proverTemplate.format(environmentVars, problem, "--higherOrder" if higherOrder else "", eArgs)
+    
+    command = proverTemplate.format(environmentVars, 
+                                    problem,
+                                    f"--eprover={eprover}" if eprover is not None else "",
+                                    "--higherOrder" if higherOrder else "",
+                                    eArgs)
+    
     print(f"Running command: '{command}'")
     try:
         p = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -62,7 +69,7 @@ def getProbId(p):
 
 class Experiment:
 
-    def __init__(self, name, path, higherOrder, problems, eArgs, useDataDir, dataDirPath):
+    def __init__(self, name, path, higherOrder, problems, eArgs, useDataDir, dataDirPath, eprover):
         self.name = name
         self.path = path
         self.higherOrder = higherOrder
@@ -76,6 +83,7 @@ class Experiment:
         self.finished = False
         self.useDataDir = useDataDir
         self.dataDirPath = dataDirPath
+        self.eprover = eprover
 
     @staticmethod
     def load(path):
@@ -156,7 +164,7 @@ Median processesed clauses: {median(list(procCountMap.values()))}
             tasks = []
             t1 = time()
             for i, problem in enumerate(track(self.problems, description="Running")):
-                tasks.append(p.apply_async(runE, args=(self.useDataDir, self.dataDirPath, self.eArgs, problem, self.higherOrder, self.successMap, self.procCountMap)))
+                tasks.append(p.apply_async(runE, args=(self.useDataDir, self.dataDirPath, self.eArgs, problem, self.higherOrder, self.successMap, self.procCountMap, self.eprover)))
                 groupsAttempted.add(getProbId(problem))
 
                 tasks = waitForWorkers(tasks, numWorkers)
@@ -199,6 +207,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("name")
     parser.add_argument("problemsPath")
+    parser.add_argument("--eprover")
     parser.add_argument("--useDataDir", action="store_true")
     parser.add_argument("--dataDirPath", default="data_dir")
     parser.add_argument("--higherOrder", action="store_true")
@@ -206,5 +215,5 @@ if __name__ == "__main__":
     parser.add_argument("--numWorkers", type=int, default=4)
     args = parser.parse_args()
 
-    exp = Experiment(args.name, args.problemsPath, args.higherOrder, sorted(glob(f"{args.problemsPath}/*.p")), args.eArgs, args.useDataDir, args.dataDirPath)
+    exp = Experiment(args.name, args.problemsPath, args.higherOrder, sorted(glob(f"{args.problemsPath}/*.p")), args.eArgs, args.useDataDir, args.dataDirPath, args.eprover)
     exp.run(numWorkers=args.numWorkers)

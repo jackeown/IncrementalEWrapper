@@ -9,8 +9,9 @@ These scripts also all use `argparse`, so you can see all command line args with
 To test full (non-incremental) strategy merging for an existing set of problems:
 
 ```shell
-python mergingExperiments.py --name="ExperimentNameGoesHere" \
-    --problemsPath="path/to/problems" \
+python mergingExperiments.py "ExperimentNameGoesHere" \
+    "path/to/problems" \
+    --eprover="/path/to/eprover" \
     --eArgs="--auto --soft-cpu-limit=60 --cpu-limit=65" \
     --numWorkers=4
 ```
@@ -24,8 +25,9 @@ To test incremental strategy merging for a set of problems<br>
 (These problems will be processed in alphabetic order):
 
 ```shell
-python incrementalExperiments.py --name="ExperimentNameGoesHere" \
-    --problemsPath="path/to/problems" \
+python incrementalExperiments.py "ExperimentNameGoesHere" \
+    "path/to/problems" \
+    --eprover="/path/to/eprover" \
     --useDataDir \
     --eArgs="--auto --soft-cpu-limit=60 --cpu-limit=65" \
     --numWorkers=4
@@ -37,8 +39,9 @@ To test E's normal `--auto` setup for comparison, run: <br>
 (The only difference is the lack of `--useDataDir`)
 
 ```shell
-python incrementalExperiments.py --name="ExperimentNameGoesHere" \
-    --problemsPath="path/to/problems" \
+python incrementalExperiments.py "ExperimentNameGoesHere" \
+    "path/to/problems" \
+    --eprover="/path/to/eprover" \
     --eArgs="--auto --soft-cpu-limit=60 --cpu-limit=65" \
     --numWorkers=4
 ```
@@ -55,3 +58,15 @@ Experiment.compareExperiments("ExperimentName1.results.pkl",
                               ...)
 
 ```
+
+
+---
+To run the incremental E wrapper by itself with persistent data on a particular problem, simply run (for instance):
+
+```shell
+SLH_PERSISTENT_DATA_DIR=./data_dir python incrementalEWrapper.py /path/to/problem.p \
+    --eprover /path/to/eprover -- \
+    --soft-cpu-limit=5 --cpu-limit=10 --auto -l2
+```
+
+(Arguments after "--" go to E.)

@@ -11,7 +11,7 @@ from multiprocessing import Pool
 def process_file(args):
     p, dataDir, higherOrder = args
     probName = os.path.split(p)[1]
-    strat = getProbStrat(p, dataDir, higherOrder)
+    strat = getProbStrat(p, dataDir, higherOrder, executable=args.eprover)
     return (probName, strat)
 
 def getMasterStrat(args):
@@ -51,6 +51,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("name")
     parser.add_argument("problemsPath")
+    parser.add_argument("--eprover")
     parser.add_argument("--higherOrder", action="store_true")
     parser.add_argument("--eArgs", default="")
     parser.add_argument("--numWorkers", type=int, default=4)
@@ -72,6 +73,8 @@ if __name__ == "__main__":
         problems=glob(f"{args.problemsPath}/*.p"),
         eArgs=f"{args.eArgs} --parse-strategy={masterStratPath}",
         useDataDir=False,
+        dataDirPath="",
+        eprover=args.eprover
     )
 
     exp.run(numWorkers=args.numWorkers)

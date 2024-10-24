@@ -2,9 +2,11 @@ import os, re, subprocess, pickle, math
 from glob import glob
 from collections import defaultdict, Counter
 
-def runE(args, masterStratPath):
-    executable = "eprover-ho" if args.higherOrder else "eprover"
-    executable = f"./eprover/PROVER/{executable}"
+def runE(args, masterStratPath, executable=None):
+
+    if executable is None:
+        executable = "eprover-ho" if args.higherOrder else "eprover"
+        executable = f"./eprover/PROVER/{executable}"
     
     if masterStratPath is not None:
         eArgs = f"{args.eArgs} --parse-strategy={masterStratPath}"
@@ -17,10 +19,12 @@ def runE(args, masterStratPath):
 
 
 
-def getProbStrat(problem, dataDir, higherOrder):
+def getProbStrat(problem, dataDir, higherOrder, executable=None):
     probName = os.path.split(problem)[1]
-    executable = "eprover-ho" if higherOrder else "eprover"
-    executable = f"./eprover/PROVER/{executable}"
+
+    if executable is None:
+        executable = "eprover-ho" if higherOrder else "eprover"
+        executable = f"./eprover/PROVER/{executable}"
     
     eArgs = f"--auto --print-strategy --cpu-limit=120"
     os.makedirs(f"{dataDir}/tmp", exist_ok=True)

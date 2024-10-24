@@ -14,34 +14,62 @@
 # 5.) The MASTER.pid.strat files are passed to E, but can be deleted immediately after use.
 #     - Same with the $SLH_PERSISTENT_DATA_DIR/tmp/$PROBLEM file.
 
-import os
-import argparse
+import os, sys
+from dataclasses import dataclass
+
 
 from helpers import runE, getProbStrat, \
     loadStratHistory, updateStratHistory, saveStratHistory, makeMasterFromHistory, \
     obtainLock, releaseLock
 
 
+@dataclass
+class Arguments:
+    problem: str
+    higherOrder: bool
+    eprover: str
+    eArgs: str
+
+def parseArgs(argv):
+    if "--help" in argv or "-h" in argv:
+        print("usage: python incrementalEWrapper.py /path/to/problem --higherOrder --eprover /path/to/eprover -- args to E go here")
+        sys.exit(0)
+
+    eproverPath = None
+    for arg in argv:
+        if arg.startswith("--eprover="):
+            eproverPath = arg.split("=")[1]
+            break
+        elif arg == "--eprover":
+            eproverPath = argv[argv.index(arg)+1]
+            break
+
+    args = Arguments(
+        problem = argv[0],
+        higherOrder = "--higherOrder" in argv,
+        eprover = eproverPath,
+        eArgs= "" if "--" not in argv else " ".join(argv[argv.index("--")+1:])
+    )
+
+    return args
+
+
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("problem")
-    parser.add_argument("--eArgs", default="")
-    parser.add_argument("--higherOrder", action="store_true")
-    args = parser.parse_args()
+    args = parseArgs(sys.argv[1:])
 
     if os.environ.get("SLH_PERSISTENT_DATA_DIR") is not None:
         print("Running E with persistent data")
         dataDir = os.environ["SLH_PERSISTENT_DATA_DIR"]
         lockPath = f"{dataDir}/lockfile"
-        newStrat = getProbStrat(args.problem, dataDir, args.higherOrder) # Saves to $SLH_PERSISTENT_DATA_DIR/tmp/$PROBLEM
+        newStrat = getProbStrat(args.problem, dataDir, args.higherOrder, executable=args.eprover) # Saves to $SLH_PERSISTENT_DATA_DIR/tmp/$PROBLEM
 
         obtainLock(lockPath)
         stratHist = updateStratHistory(loadStratHistory(dataDir), newStrat) # 3.b.
         saveStratHistory(stratHist, dataDir)                                # 3.b. 
         masterStratPath = makeMasterFromHistory(stratHist, dataDir)         # 3.c.
         releaseLock(lockPath)
-        runE(args, masterStratPath)
+        runE(args, masterStratPath, executable=args.eprover)
     else:
         print("Running E without persistent data")
-        runE(args, None)
+        runE(args, None, executable=args.eprover)
